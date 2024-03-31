@@ -6,6 +6,14 @@
     "module": "ESNext",
     "skipLibCheck": true,
 
+    "types": ["vite-plugin-svgr/client"],
+
+    // 路径别名
+    "baseUrl": "./",
+    "paths": {
+      "@/*": ["src/*"]
+    },
+
     /* Bundler mode */
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
@@ -20,6 +28,6 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src"],
+  "include": ["src/**/*.ts", "src/**/*.tsx"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }
