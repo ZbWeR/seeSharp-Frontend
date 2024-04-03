@@ -1,11 +1,29 @@
+import { serverHello, serverHelloPost } from "@/service/api";
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 const Home = () => {
   const navigate = useNavigate();
 
-  const handleStart = () => {
+  const handleStart = async () => {
     navigate("/login");
   };
+
+  useEffect(() => {
+    const test_server = async () => {
+      const getRes = await serverHello("dora");
+      if (getRes?.msg) console.log("[GET]: Server is running: ", getRes.msg);
+
+      const postRes = await serverHelloPost({ name: "dora" });
+      if (postRes?.code == 0) {
+        console.log(postRes);
+        localStorage.setItem("token", postRes.data.access_token);
+        console.log("[POST]: Server is running: ", postRes.msg);
+      }
+    };
+
+    test_server();
+  }, []);
 
   return (
     <div
