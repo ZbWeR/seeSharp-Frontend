@@ -5,6 +5,7 @@ import { useState, useRef, useCallback } from "react";
 import { faceAuth } from "@/service/api";
 import { message } from "antd";
 import { useCamera } from "@/hooks/useCamera";
+import { useNavigate } from "react-router-dom";
 
 interface LoginInfo {
   title: string;
@@ -15,23 +16,30 @@ const Login = () => {
   const [role, setRole] = useState<string>("");
   const isSettled = useRef<boolean>(false);
   const wrapperRef = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate();
 
-  const verify = useCallback(async (blob: Blob) => {
-    try {
-      const { code, data } = await faceAuth(blob);
-      if (code === 0 && !isSettled.current) {
-        message.success(`验证成功, 欢迎您, ${data[0]}`);
+  const verify = useCallback(
+    async (blob: Blob) => {
+      try {
+        const { code, data } = await faceAuth(blob);
+        if (code === 0 && !isSettled.current) {
+          // TODO: 多个匹配结果需二次验证
+          message.success(`验证成功, 欢迎您 ${data[0]}`);
+          isSettled.current = true;
+          navigate("/shop");
+          return true;
+        }
+        return false;
+      } catch (error) {
+        console.log(error);
+        if (isSettled.current) return true;
+        message.error("服务器错误, 请稍后再试");
         isSettled.current = true;
         return true;
       }
-      return false;
-    } catch (error) {
-      if (isSettled.current) return true;
-      message.error("服务器错误, 请稍后再试");
-      isSettled.current = true;
-      return true;
-    }
-  }, []);
+    },
+    [navigate]
+  );
 
   const { cameraRef, startCapturing, loading, isTimeout } = useCamera({
     callback: verify,
