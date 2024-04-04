@@ -2,7 +2,7 @@ import axios from "axios";
 
 const service = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
-  timeout: 10000,
+  timeout: 15000,
 });
 
 service.interceptors.request.use(
@@ -15,6 +15,15 @@ service.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// TODO: 响应拦截
+service.interceptors.response.use(
+  (res) => res,
+  (error) => {
+    if (error.code === "ECONNABORTED") {
+      console.error("请求超时");
+      return new Promise(() => {});
+    }
+    return Promise.reject(error);
+  }
+);
 
 export default service;
