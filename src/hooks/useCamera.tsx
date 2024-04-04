@@ -1,14 +1,16 @@
 import { message } from "antd";
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 interface CameraProps {
-  // 捕获帧后的回调函数, 需要错误处理
+  // 捕获帧后的回调函数, 需要手动处理错误, 返回 true 表示结束捕获
   callback: (data: Blob) => Promise<boolean>;
 
   // 捕获帧的时间间隔
   interval?: number;
   // 捕获帧的最大时间
   maxTime?: number;
+  // 超时回调函数
+  timeoutCallback?: () => void;
 
   // 摄像头画面的宽高
   height?: number;
@@ -20,15 +22,6 @@ const defaultOptions: Partial<CameraProps> = {
   maxTime: 10000,
 };
 
-// TODO: 添加 loading 状态
-// const renderLoading = () => {
-//   return (
-//     <>
-//       <span className="loading loading-spinner loading-lg text-sky-400"></span>
-//       {/* <p className="mt-2 text-sm text-neutral-500">正在进行身份验证...</p> */}
-//     </>
-//   );
-// };
 /**
  * 调用摄像头并捕获帧上传到服务器
  * @param options - 配置项
@@ -37,7 +30,7 @@ const defaultOptions: Partial<CameraProps> = {
  * -  maxTime : 捕获帧的最大时间, 默认 10000ms
  */
 export const useCamera = (options: CameraProps) => {
-  const { callback, interval, maxTime, height, width } = {
+  const { callback, interval, maxTime, height, width, timeoutCallback } = {
     ...defaultOptions,
     ...options,
   } as Required<CameraProps>;
@@ -45,11 +38,14 @@ export const useCamera = (options: CameraProps) => {
   const cameraRef = useRef<HTMLVideoElement>(null);
   const intervalRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const startTimeRef = useRef<number | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [isTimeout, setIsTimeout] = useState(false);
 
   // 清理函数
   const cleanup = useCallback(() => {
     // 清理定时器
-    clearInterval(intervalRef.current!);
+    const interval = intervalRef.current;
+    clearInterval(interval!);
     // 关闭摄像头
     const camera = cameraRef.current;
     if (camera && camera.srcObject) {
@@ -61,6 +57,7 @@ export const useCamera = (options: CameraProps) => {
 
   //   获取用户摄像头权限
   const startCamera = useCallback(async () => {
+    setLoading(true);
     const video = cameraRef.current;
     if (!video) return;
 
@@ -71,6 +68,8 @@ export const useCamera = (options: CameraProps) => {
       video.srcObject = stream;
     } catch (error) {
       message.error("无权访问您的摄像头");
+    } finally {
+      setLoading(false);
     }
   }, [height, width]);
 
@@ -96,6 +95,7 @@ export const useCamera = (options: CameraProps) => {
   );
 
   const startCapturing = useCallback(async () => {
+    setIsTimeout(false);
     await startCamera();
     const camera = cameraRef.current;
     if (!camera) return;
@@ -108,14 +108,15 @@ export const useCamera = (options: CameraProps) => {
       // 超时停止发送帧
       if (Date.now() - (startTimeRef.current || 0) > maxTime) {
         cleanup();
-        console.log("Frame sending stopped because of timeout.");
+        timeoutCallback && timeoutCallback();
+        setIsTimeout(true);
       }
     }, interval);
-  }, [interval, captureAndSendFrame, startCamera, cleanup, maxTime]);
+  }, [interval, captureAndSendFrame, startCamera, cleanup, maxTime, timeoutCallback]);
 
   useEffect(() => {
     return () => cleanup();
   }, [cleanup]);
 
-  return { cameraRef, startCapturing, cleanup };
+  return { cameraRef, startCapturing, loading, isTimeout };
 };
