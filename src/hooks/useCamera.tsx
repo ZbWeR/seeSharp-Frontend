@@ -29,6 +29,10 @@ const defaultOptions: Partial<CameraProps> = {
  * -  interval : 捕获帧的时间间隔, 默认 2000ms
  * -  maxTime : 捕获帧的最大时间, 默认 10000ms
  */
+
+/**
+ * TODO: 将回调函数拆分为请求与成功失败两个回调, 并在内部进行接口缓存
+ */
 export const useCamera = (options: CameraProps) => {
   const { callback, interval, maxTime, height, width, timeoutCallback } = {
     ...defaultOptions,
