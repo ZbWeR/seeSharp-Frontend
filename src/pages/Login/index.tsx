@@ -43,7 +43,7 @@ const Login = () => {
 
   const { cameraRef, startCapturing, loading, isTimeout } = useCamera({
     callback: verify,
-    height: 256,
+    // height: 256,
     timeoutCallback: () => message.error("验证超时, 请重试"),
   });
 
@@ -112,9 +112,9 @@ const Login = () => {
           }
           ref={wrapperRef}
         >
-          <video ref={cameraRef} className="absolute" playsInline autoPlay />
+          <video ref={cameraRef} className="" playsInline autoPlay />
           {/* 背景 */}
-          <div className="flex items-center justify-center w-full min-h-64 bg-neutral"></div>
+          {/* <div className="flex items-center justify-center w-full min-h-64 bg-neutral"></div> */}
           <div className="absolute flex items-center justify-center w-full h-full">
             {loading ? renderLoading() : null}
             {!loading && isTimeout ? renderRetry() : null}

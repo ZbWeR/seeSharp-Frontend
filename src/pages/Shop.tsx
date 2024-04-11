@@ -38,13 +38,17 @@ const Shop = () => {
     await startCapturing();
   };
 
+  const wrapperClass = isBtnVisible
+    ? "hidden"
+    : "flex flex-col items-center justify-center w-[640px] text-center bg-white";
+
   return (
-    <div className="flex items-center justify-center w-screen h-screen bg-sky-50">
-      <div className="flex flex-col items-center justify-center w-[640px] text-center bg-white">
-        <button className={isBtnVisible ? "btn" : "hidden"} onClick={handleShopping}>
-          Shopping
-        </button>
-        <div className="relative flex items-center justify-center w-full h-full">
+    <div className="flex flex-col items-center justify-center w-screen h-screen bg-sky-50">
+      <button className={isBtnVisible ? "btn" : "hidden"} onClick={handleShopping}>
+        Shopping
+      </button>
+      <div className={wrapperClass}>
+        <div className="relative flex items-center justify-center w-full h-full ">
           <video ref={cameraRef} className="object-cover w-full" playsInline autoPlay />
         </div>
       </div>
