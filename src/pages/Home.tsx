@@ -12,14 +12,18 @@ const Home = () => {
 
   useEffect(() => {
     const test_server = async () => {
-      const getRes = await serverHello("dora");
-      console.log("method GET status: ", getRes.msg);
+      try {
+        const getRes = await serverHello("dora");
+        console.log("method GET status: ", getRes.msg);
 
-      const postRes = await serverHelloPost({ name: "dora" });
-      console.log("method GET status ", postRes.msg);
+        const postRes = await serverHelloPost({ name: "dora" });
+        console.log("method GET status ", postRes.msg);
 
-      if (postRes.msg === "success" && getRes.msg === "success") {
-        message.success("Server is ready");
+        if (postRes.msg === "success" && getRes.msg === "success") {
+          message.success("Server is ready");
+        }
+      } catch (error) {
+        message.error("Server Error");
       }
     };
 

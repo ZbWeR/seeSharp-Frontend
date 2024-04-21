@@ -44,6 +44,7 @@ export const useCamera = (options: CameraProps) => {
   const startTimeRef = useRef<number | null>(null);
   const [loading, setLoading] = useState(false);
   const [isTimeout, setIsTimeout] = useState(false);
+  const [isFinished, setIsFinished] = useState(false);
 
   // 清理函数
   const cleanup = useCallback(() => {
@@ -91,7 +92,10 @@ export const useCamera = (options: CameraProps) => {
         if (blob) {
           // 将帧信息交由回调函数处理
           const isFinished = await callback(blob);
-          if (isFinished) cleanup();
+          if (isFinished) {
+            cleanup();
+            setIsFinished(true);
+          }
         }
       }, "image/jpeg");
     },
@@ -100,6 +104,8 @@ export const useCamera = (options: CameraProps) => {
 
   const startCapturing = useCallback(async () => {
     setIsTimeout(false);
+    setIsFinished(false);
+
     await startCamera();
     const camera = cameraRef.current;
     if (!camera) return;
@@ -114,6 +120,7 @@ export const useCamera = (options: CameraProps) => {
         cleanup();
         timeoutCallback && timeoutCallback();
         setIsTimeout(true);
+        setIsFinished(true);
       }
     }, interval);
   }, [interval, captureAndSendFrame, startCamera, cleanup, maxTime, timeoutCallback]);
@@ -122,5 +129,5 @@ export const useCamera = (options: CameraProps) => {
     return () => cleanup();
   }, [cleanup]);
 
-  return { cameraRef, startCapturing, loading, isTimeout };
+  return { cameraRef, startCapturing, loading, isTimeout, isFinished };
 };
