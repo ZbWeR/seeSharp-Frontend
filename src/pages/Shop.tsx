@@ -108,7 +108,7 @@ const Shop = () => {
             <p className="mt-2 text-gray-400 transition-all group-hover:text-black">
               {product.price}￥
             </p>
-            <p className="">{product.name}</p>
+            <p className={product.name.includes("-") ? "text-sm" : ""}>{product.name}</p>
           </div>
         ))}
         {productList.length < 12 &&
