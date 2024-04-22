@@ -5,18 +5,19 @@ import { Product } from "@/utils";
 import { message } from "antd";
 import axios from "axios";
 import { useRef, useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 const Shop = () => {
   const isSettled = useRef<boolean>(false);
   const [isBtnVisible, setIsBtnVisible] = useState(true);
   const [productList, setProductList] = useState<Product[]>([]);
+  const navigate = useNavigate();
 
   const prefix = import.meta.env.VITE_DATA_API_URL;
 
   useEffect(() => {
     const fetchData = async () => {
       const { data } = await axios.get(`${prefix}/product/all`);
-      console.log(data);
       if (data.statusCode !== 0) message.error(data?.message || "获取商品列表失败");
       else setProductList(data.data);
     };
@@ -29,9 +30,12 @@ const Shop = () => {
       const { code, data } = await productPredict(blob);
       if (code === 0 && data?.length > 0 && !isSettled.current) {
         const label = data[0].rec_docs;
-        message.success(`识别到商品: ${label}`);
-        setIsBtnVisible(true);
         isSettled.current = true;
+        setIsBtnVisible(true);
+        message.success(`识别到商品: ${label}`);
+        navigate("/result", {
+          state: { product: productList.find((item) => item.name === label) },
+        });
         return true;
       }
       return false;
@@ -108,8 +112,11 @@ const Shop = () => {
           </div>
         ))}
         {productList.length < 12 &&
-          new Array(12 - productList.length).fill(0).map(() => (
-            <div className="flex flex-col items-center justify-center flex-grow-0 p-4">
+          new Array(12 - productList.length).fill(0).map((_, index) => (
+            <div
+              key={index}
+              className="flex flex-col items-center justify-center flex-grow-0 p-4"
+            >
               <div className="w-24 h-24 skeleton"></div>
               <div className="w-12 h-4 mt-2 skeleton"></div>
               <div className="w-16 h-4 mt-2 skeleton"></div>
