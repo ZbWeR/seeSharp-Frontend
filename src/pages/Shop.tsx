@@ -19,7 +19,10 @@ const Shop = () => {
     const fetchData = async () => {
       const { data } = await axios.get(`${prefix}/product/all`);
       if (data.statusCode !== 0) message.error(data?.message || "获取商品列表失败");
-      else setProductList(data.data);
+      else {
+        const list = data.data.filter((item: Product) => item.isOnSale);
+        setProductList(list);
+      }
     };
     fetchData();
     return () => setProductList([]);
@@ -98,7 +101,7 @@ const Shop = () => {
             key={product.id}
             className="flex flex-col items-center justify-center flex-grow-0 p-4 transition-all duration-200 bg-white max-h-44 group rounded-2xl hover:-translate-y-1 hover:bg-black/5"
           >
-            <div className="w-24 h-24">
+            <div className="relative w-24 h-24">
               <img
                 src={`${prefix}${product.imageUrl}`}
                 alt={product.name}

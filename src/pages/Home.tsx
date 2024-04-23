@@ -1,5 +1,6 @@
 import { serverHello, serverHelloPost } from "@/service/api";
 import { message } from "antd";
+import axios from "axios";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -27,7 +28,18 @@ const Home = () => {
       }
     };
 
+    const test_data_server = async () => {
+      try {
+        const { data } = await axios.get(`${import.meta.env.VITE_DATA_API_URL}/ping`);
+        console.log("data server status: ", data);
+        if (data.statusCode === 0) message.success("Data Server is ready");
+      } catch (error) {
+        message.error("Data Server Error");
+      }
+    };
+
     test_server();
+    test_data_server();
   }, []);
 
   return (
