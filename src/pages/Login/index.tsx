@@ -32,6 +32,7 @@ const getAuthInfoByID = async (id: string, role: string) => {
     message.error("数据库中未找到该用户信息");
     return false;
   }
+  localStorage.setItem("authInfo", JSON.stringify(authInfo));
   message.success(`验证成功, 欢迎您 ${authInfo.name}`);
   return true;
 };
@@ -62,7 +63,7 @@ const Login = () => {
         }
         return false;
       } catch (error) {
-        console.log(error);
+        console.error(error);
         if (isSettled.current) return true;
         message.error("服务器错误, 请稍后再试");
         isSettled.current = true;

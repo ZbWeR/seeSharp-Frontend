@@ -12,12 +12,11 @@ export const serverHelloPost = async (data: any) => {
 
 /**
  * 上传已知人脸照片, 以便之后登陆进行人脸识别
- * TODO: 上传相关信息更新数据库
  */
-export const uploadImage = async (data: Blob) => {
-  console.log(`image size: ${data.size / 1024}KB`);
+export const uploadImage = async (data: File, name: string) => {
+  const extName = data.name.split(".").pop();
   const formData = new FormData();
-  formData.append("image", data, "mmm.jpg"); // ! 此处硬编码需要修改
+  formData.append("image", data, `${name}.${extName}`);
   const res = await service.post("/face/controller", formData);
   return res.data;
 };
