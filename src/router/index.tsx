@@ -3,7 +3,7 @@ import Home from "@/pages/Home";
 import ErrorPage from "@/pages/404";
 import Shop from "@/pages/Shop";
 import Login from "@/pages/Login";
-import Dashboard from "@/pages/Dashboard";
+import Dashboard from "@/pages/Dashboard/index";
 import Result from "@/pages/Result";
 
 const routes: RouteObject[] = [
