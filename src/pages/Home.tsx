@@ -3,6 +3,7 @@ import { message } from "antd";
 import axios from "axios";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import bgImage from "../assets/home-bg.jpg";
 
 const Home = () => {
   const navigate = useNavigate();
@@ -46,8 +47,7 @@ const Home = () => {
     <div
       className="min-h-screen hero"
       style={{
-        backgroundImage:
-          'url("https://daisyui.com/images/stock/photo-1507358522600-9f71e620c44e.jpg")',
+        backgroundImage: `url(${bgImage})`,
       }}
     >
       <div className="bg-opacity-70 hero-overlay"></div>
